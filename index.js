@@ -14,11 +14,8 @@ const cssObject = loadStyle('agate');
 const conversionTable = generateHTMLToConsoleConversionTable(cssObject);
 
 conversionTable.forEach(({ name, value }) => {
-  console.log(name);
   const rgbArray = parse(value).rgb;
   const fixedRgbArray = rgbArray == undefined ? [255, 255, 255] : rgbArray;
-  console.log(value);
-  console.log(fixedRgbArray);
   //'\x1b' +
   htmlString = htmlString
     .split(name)
@@ -29,7 +26,7 @@ conversionTable.forEach(({ name, value }) => {
     );
 });
 htmlString = htmlString.split('</span>').join('\x1b[0m');
-
+htmlString = htmlString.replace(/<span class="[a-z,-]*">/gm, '');
 const unescapedHtmlString = he.unescape(htmlString);
 
 console.log(unescapedHtmlString);
