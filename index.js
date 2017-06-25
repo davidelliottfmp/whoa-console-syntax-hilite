@@ -3,24 +3,39 @@ const fs = require('fs');
 const css = require('css');
 const he = require('he');
 const getInstalledPath = require('get-installed-path');
+const parse = require('parse-color');
 
 const sourceFile = fs.readFileSync('index.js', 'utf8');
-const htmlString = hljs.highlight('js', sourceFile).value;
-console.log(htmlString);
-const unescapedHtmlString = he.unescape(htmlString);
-
-// console.log(unescapedHtmlString);
-var obj = css.parse('body { font-size: 12px; }', {});
-// console.log(css.stringify(obj, {}));
+var htmlString = hljs.highlight('js', sourceFile).value;
 
 console.log('\x1b[38;2;255;100;0mTRUECOLOR\x1b[0m\n');
 
 const cssObject = loadStyle('agate');
 const conversionTable = generateHTMLToConsoleConversionTable(cssObject);
-console.log(cssObject.stylesheet);
+
+conversionTable.forEach(({ name, value }) => {
+  console.log(name);
+  const rgbArray = parse(value).rgb;
+  const fixedRgbArray = rgbArray == undefined ? [255, 255, 255] : rgbArray;
+  console.log(value);
+  console.log(fixedRgbArray);
+  //'\x1b' +
+  htmlString = htmlString
+    .split(name)
+    .join(
+      '\x1b' +
+        '[38;2;' +
+        `${fixedRgbArray[0]};${fixedRgbArray[1]};${fixedRgbArray[2]}m`
+    );
+});
+htmlString = htmlString.split('</span>').join('\x1b[0m');
+
+const unescapedHtmlString = he.unescape(htmlString);
+
+console.log(unescapedHtmlString);
 
 function generateHTMLToConsoleConversionTable(cssObject) {
-  var lookupObject = {};
+  var lookupObject = [];
   console.log(JSON.stringify(cssObject));
   cssObject.stylesheet.rules.forEach(rule => {
     if (rule.type == 'rule') {
@@ -29,9 +44,10 @@ function generateHTMLToConsoleConversionTable(cssObject) {
           rule.selectors.forEach(cssName => {
             const splitNames = cssName.split(' ');
             splitNames.forEach(splitCssName => {
-              lookupObject[
-                `<span class="${splitCssName.substr(1)}">`
-              ] = `${declaration.value}`;
+              lookupObject.push({
+                name: `<span class="${splitCssName.substr(1)}">`,
+                value: `${declaration.value}`
+              });
             });
           });
         }
