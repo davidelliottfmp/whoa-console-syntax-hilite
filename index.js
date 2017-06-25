@@ -8,9 +8,7 @@ const parse = require('parse-color');
 const sourceFile = fs.readFileSync('index.js', 'utf8');
 var htmlString = hljs.highlight('js', sourceFile).value;
 
-console.log('\x1b[38;2;255;100;0mTRUECOLOR\x1b[0m\n');
-
-const cssObject = loadStyle('agate');
+const cssObject = loadStyle('darcula');
 const conversionTable = generateHTMLToConsoleConversionTable(cssObject);
 
 conversionTable.forEach(({ name, value }) => {
@@ -33,7 +31,6 @@ console.log(unescapedHtmlString);
 
 function generateHTMLToConsoleConversionTable(cssObject) {
   var lookupObject = [];
-  console.log(JSON.stringify(cssObject));
   cssObject.stylesheet.rules.forEach(rule => {
     if (rule.type == 'rule') {
       rule.declarations.forEach(declaration => {
