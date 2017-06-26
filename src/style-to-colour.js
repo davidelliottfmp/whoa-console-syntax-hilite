@@ -17,7 +17,7 @@ function generateHTMLToConsoleConversionTable(cssObject) {
                 ? [255, 255, 255]
                 : rgbArray;
               lookupObject.push({
-                name: `<span class="${splitCssName.substr(1)}">`,
+                name: splitCssName.substr(1),
                 value: fixedRgbArray
               });
             });
