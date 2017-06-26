@@ -12,16 +12,9 @@ const cssObject = loadStyle('darcula');
 const conversionTable = generateHTMLToConsoleConversionTable(cssObject);
 
 conversionTable.forEach(({ name, value }) => {
-  const rgbArray = parse(value).rgb;
-  const fixedRgbArray = rgbArray == undefined ? [255, 255, 255] : rgbArray;
-  //'\x1b' +
   htmlString = htmlString
     .split(name)
-    .join(
-      '\x1b' +
-        '[38;2;' +
-        `${fixedRgbArray[0]};${fixedRgbArray[1]};${fixedRgbArray[2]}m`
-    );
+    .join('\x1b' + '[38;2;' + `${value[0]};${value[1]};${value[2]}m`);
 });
 htmlString = htmlString.split('</span>').join('\x1b[0m');
 htmlString = htmlString.replace(/<span class="[a-z,-]*">/gm, '');
@@ -38,9 +31,13 @@ function generateHTMLToConsoleConversionTable(cssObject) {
           rule.selectors.forEach(cssName => {
             const splitNames = cssName.split(' ');
             splitNames.forEach(splitCssName => {
+              const rgbArray = parse(declaration.value).rgb;
+              const fixedRgbArray = rgbArray == undefined
+                ? [255, 255, 255]
+                : rgbArray;
               lookupObject.push({
                 name: `<span class="${splitCssName.substr(1)}">`,
-                value: `${declaration.value}`
+                value: rgbArray
               });
             });
           });
