@@ -4,7 +4,7 @@ const getInstalledPath = require("get-installed-path");
 const parse = require("parse-color");
 
 function generateHTMLToConsoleConversionTable(cssObject) {
-  var lookupObject = [];
+  var lookupObject = {};
   cssObject.stylesheet.rules.forEach(rule => {
     if (rule.type == "rule") {
       rule.declarations.forEach(declaration => {
@@ -16,10 +16,7 @@ function generateHTMLToConsoleConversionTable(cssObject) {
               const fixedRgbArray = rgbArray == undefined
                 ? [255, 255, 255]
                 : rgbArray;
-              lookupObject.push({
-                name: splitCssName.substr(1),
-                value: fixedRgbArray
-              });
+              lookupObject[splitCssName.substr(1)] = fixedRgbArray;
             });
           });
         }

@@ -24,13 +24,10 @@ function walkDomAndConvert(htmlString, colourTable) {
     {
       onopentag: function(name, attribs) {
         if (name === "span") {
-          console.log(attribs);
           const colour = conversionTable[attribs.class];
-          colours.push(colour);
-          console.log(colour);
-          // Push exc
-          outputString =
-            outputString + `<span ${colour[0]},${colour[1]},${colour[2]}>`;
+          const validatedColour = colour ? colour : [255, 255, 255];
+          colours.push(validatedColour);
+          outputString = outputString + terminalColor(validatedColour);
         }
       },
       ontext: function(text) {
@@ -39,9 +36,9 @@ function walkDomAndConvert(htmlString, colourTable) {
       onclosetag: function(tagname) {
         if (tagname === "span") {
           colours.pop();
-          const colour = colours.slice(-1).pop();
-          outputString =
-            outputString + `</span ${colour[0]},${colour[1]},${colour[2]}>`;
+          const poppedColour = colours.slice(-1).pop();
+          const colour = poppedColour ? poppedColour : [255, 255, 255];
+          outputString = outputString + terminalColor(colour);
         }
       }
     },
@@ -50,6 +47,10 @@ function walkDomAndConvert(htmlString, colourTable) {
   parser.write(htmlString);
   parser.end();
   return outputString;
+}
+
+function terminalColor(colour) {
+  return "\x1b" + "[38;2;" + `${colour[0]};${colour[1]};${colour[2]}m`;
 }
 
 conversionTable.forEach(({ name, value }) => {
